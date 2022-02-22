@@ -70,20 +70,27 @@ if(isset($_POST["getList"])) {
 
 //チェックした記事を更新
 if(isset($_POST["update"]) && is_array($_POST["update"])) {
+
+
+    //今日の間で更新（過去のみ）
+    date_default_timezone_set("Asia/TOKYO");
+
+    $hour = date("H");
+    $minutes = date("i");
+    $seconds = date("s");
+
+    $totalSeconds = $hour*3600 + $minutes*60 + $seconds;
     
+    //更新は過去の範囲でする（その日のうち）
     foreach($_POST["update"] as $post){
 
-        $random = mt_rand(1,300);
-
+        $random = mt_rand(1,$totalSeconds);
         date_default_timezone_set("UTC");
-
-        $random_new_time_gmt = date("Y-m-d H:i:s\n",strtotime("+$random seconds"));
-
+        $random_new_time_gmt = date("Y-m-d H:i:s\n",strtotime("-$random seconds"));
         date_default_timezone_set("Asia/TOKYO");
+        $random_new_time = date("Y-m-d H:i:s\n",strtotime("-$random seconds"));
 
-        $random_new_time = date("Y-m-d H:i:s\n",strtotime("+$random seconds"));
-
-        echo get_post($post)->post_title;
+        echo "OK:".get_post($post)->post_title;
         echo "　JST".$random_new_time;
         echo "　GMT".$random_new_time_gmt."</br>";
 
