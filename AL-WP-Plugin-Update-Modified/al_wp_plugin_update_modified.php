@@ -19,13 +19,14 @@ Plugin Name: AL WP Plugin Update Modified
  function my_custom_admin()  {
 ?>
 <form method="post">
-    <input type="submit" name="update" value="更新">
+    <input type="submit" name="getList" value="更新一覧取得">
 </form>
+</br>
 
 <?php
 
-
-if(isset($_POST["update"])) {
+//記事一覧を取得
+if(isset($_POST["getList"])) {
 
     $args = [
 		'orderby' => 'modified',
@@ -34,42 +35,71 @@ if(isset($_POST["update"])) {
 	];
 
 
-    $stack = array();
     $custom_posts = get_posts($args);
+
+?>
+<form method="POST">
+<?php
+
     foreach($custom_posts as $post){
+
+?>
+
+        <input type="checkbox" name="update[]" value="<?php echo $post->ID; ?>" id="check<?php echo $post->ID; ?>" checked="checked">
+        <label for="check<?php echo $post->ID; ?>">
+            <?php echo $post->post_title; ?>　　　最終更新日：<?php echo $post->post_modified;?>
+            </br>
+        </label>
+
+<?php
         
-        $new_time = current_time('mysql');
-        $new_time_gmt = current_time('mysql',1);
-        $success_message =null;
-        // $post->post_date;
-        // 公開日
-        
-        // $post->post_modified;
-        // 更新日
+    };
+
+?>
+
+</br>
+<p>チェックした記事のみ更新します</p>
+<input type="submit" value="更新">
+</form>
+    <!-- <form method="post">
+    <input type="submit" name="update" value="更新">
+    </form> -->
+
+<?php
+}
+
+//チェックした記事を更新
+if(isset($_POST["update"]) && is_array($_POST["update"])) {
+    
+    foreach($_POST["update"] as $post){
+
+        $random = mt_rand(1,300);
+
+        date_default_timezone_set("UTC");
+
+        $random_new_time_gmt = date("Y-m-d H:i:s\n",strtotime("+$random seconds"));
+
+        date_default_timezone_set("Asia/TOKYO");
+
+        $random_new_time = date("Y-m-d H:i:s\n",strtotime("+$random seconds"));
+
+        echo get_post($post)->post_title;
+        echo "　JST".$random_new_time;
+        echo "　GMT".$random_new_time_gmt."</br>";
 
         $my_post = [
-            'ID' => $post->ID,
-            'post_modified' => $new_time,
-            'post_modified_gmt' => $new_time_gmt,
-
+            'ID' => $post,
+            'post_modified' => $random_new_time,
+            'post_modified_gmt' => $random_new_time_gmt,
         ];
 
-        $ret = wp_update_post($my_post);
-        if ($ret !== $post->ID){
-            echo "★NG:" . $post->ID;
-        }
-        array_push($stack,$post->post_title);
+        wp_update_post($my_post);
+        
+    }
+    echo count($_POST["update"])."個の記事を更新しました";
 
-    };
-    ?>
-    <p>
-        <?php echo '以下'.count($stack).'個の記事を更新しました<br/>'; ?>
-    </p>
-<?php
-    foreach($stack as $value) {
-        echo 'OK:'.$value.'<br />';
-    }    
-}
+} 
 
 }
+
 ?>
