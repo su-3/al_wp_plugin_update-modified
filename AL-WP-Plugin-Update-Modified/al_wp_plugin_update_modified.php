@@ -1,6 +1,6 @@
 <?php 
 /*
-Plugin Name: AL WP Plugin Update Modified
+Plugin Name: AL WP Plugin Update Modified v1.1
 */
  add_action( 'admin_menu', 'my_admin_menu');
 
@@ -19,7 +19,7 @@ Plugin Name: AL WP Plugin Update Modified
  function my_custom_admin()  {
 ?>
 <form method="post">
-    <input type="submit" name="getList" value="更新一覧取得">
+    <input type="submit" name="getList" value="投稿日/更新一覧取得">
 </form>
 </br>
 
@@ -29,7 +29,7 @@ Plugin Name: AL WP Plugin Update Modified
 if(isset($_POST["getList"])) {
 
     $args = [
-		'orderby' => 'modified',
+		'orderby' => 'date',
 		'order' => 'ASC',
 		'numberposts' => 100
 	];
@@ -47,7 +47,7 @@ if(isset($_POST["getList"])) {
 
         <input type="checkbox" name="update[]" value="<?php echo $post->ID; ?>" id="check<?php echo $post->ID; ?>" checked="checked">
         <label for="check<?php echo $post->ID; ?>">
-            <?php echo $post->post_title; ?>　　　最終更新日：<?php echo $post->post_modified;?>
+            <?php echo $post->post_title; ?>最新投稿日：<?php echo $post->post_modified;?>
             </br>
         </label>
 
@@ -96,6 +96,8 @@ if(isset($_POST["update"]) && is_array($_POST["update"])) {
 
         $my_post = [
             'ID' => $post,
+            'post_date' => $random_new_time,
+            'post_date_gmt' => $random_new_time_gmt,
             'post_modified' => $random_new_time,
             'post_modified_gmt' => $random_new_time_gmt,
         ];
